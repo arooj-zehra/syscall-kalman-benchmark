@@ -9,7 +9,7 @@ Record of the machine and tools used for every benchmark in this project. Fill i
 | OS | Windows 10, build 19045.7725 | Ubuntu 26.04 LTS (`resolute`) |
 | How it runs | Native | **WSL2** (lightweight virtual machine) |
 | Shell used | `cmd` | `bash` in WSL |
-| `os:` line from `hello` | _paste here_ | _paste here_ |
+| `os:` line from `hello` | `os: Windows build 19045.7725 x64` | `os: Linux 6.18.40.1-microsoft-standard-WSL2 x86_64 (WSL detected)` |
 
 **WSL2 note for the report:** Linux numbers come from a WSL2 virtual machine, not bare-metal Linux. System call and process-creation timings can differ from native Linux, so the Windows-versus-Linux comparison is "native Windows versus Linux under WSL2", on the same physical machine.
 
@@ -27,15 +27,15 @@ Record of the machine and tools used for every benchmark in this project. Fill i
 
 Build flags: C11, `Release`, same optimisation level on both systems (set by `CMakeLists.txt`).
 
-## Hardware (fill in)
+## Hardware
 
 | Item | Value |
 | --- | --- |
-| CPU model | |
-| Physical cores / logical CPUs | |
-| RAM | |
-| Disk type (SSD / HDD / NVMe) | |
-| WSL2 memory and CPU limits (`.wslconfig`) | default / custom: |
+| CPU model | Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz (up to 2.81 GHz) |
+| Physical cores / logical CPUs | 4 physical cores / 8 logical CPUs |
+| RAM | 16.0 GB (15.9 GB usable) |
+| Disk type (SSD / HDD / NVMe) | 238 GB SATA SSD (SK Hynix HFS256G39TND-N210A) |
+| WSL2 memory and CPU limits (`.wslconfig`) | default (allocates up to 50% host RAM ~8 GB, 8 logical CPUs) |
 
 Tip: in `cmd`, `wmic cpu get name,numberofcores,numberoflogicalprocessors` and `wmic memorychip get capacity`; in WSL, `lscpu` and `free -h`.
 

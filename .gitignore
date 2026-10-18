@@ -1,0 +1,32 @@
+# Build output
+build/
+build-*/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+
+# Binaries
+*.exe
+*.o
+*.obj
+*.a
+*.lib
+*.out
+
+# Logs and generated run data (keep the folders, not the large files)
+*.log
+data/*.bin
+data/*.dat
+results/tmp/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Editors / OS
+.vscode/*
+!.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db

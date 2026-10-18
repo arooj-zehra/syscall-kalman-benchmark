@@ -1,0 +1,11 @@
+# The same repository is cloned on Windows and inside WSL. Without these rules,
+# a shell script checked out on Windows gets CRLF line endings and fails in WSL.
+* text=auto
+*.sh   text eol=lf
+*.c    text eol=lf
+*.h    text eol=lf
+*.py   text eol=lf
+*.md   text eol=lf
+CMakeLists.txt text eol=lf
+*.bat  text eol=crlf
+*.cmd  text eol=crlf

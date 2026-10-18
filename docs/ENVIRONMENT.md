@@ -41,8 +41,9 @@ Tip: in `cmd`, `wmic cpu get name,numberofcores,numberoflogicalprocessors` and `
 
 ## Conditions to keep constant during benchmark runs
 
-- [ ] Power plan set to High performance, laptop plugged in
-- [ ] Other applications closed
-- [ ] Windows real-time antivirus scanning: on / off (state which; it slows `CreateFile`)
-- [ ] Same machine for both operating systems
-- [ ] Number of repeats per run: 5
+- [x] Power plan set to High performance, laptop plugged in
+- [x] Other applications closed
+- [x] Windows real-time antivirus scanning: ON (Windows Defender active; accounts for higher CreateFile/plat_unlink latency)
+- [x] Same machine for both operating systems
+- [x] Number of repeats per run: 5
+- [x] Compiler split noted: GCC 15.2.0 on WSL2 Linux vs. GCC 14.2.0 (MinGW-w64) on native Windows

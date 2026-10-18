@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/resource.h>
 #include <sys/utsname.h>
 #include <time.h>
 #include <unistd.h>
@@ -89,4 +90,43 @@ int plat_selftest_failing_call(void)
         return 0;
     }
     return -1;
+}
+
+int plat_usage_self(plat_usage *u)
+{
+    struct rusage ru;
+
+    if (getrusage(RUSAGE_SELF, &ru) != 0) {
+        return -1;
+    }
+    u->user_us = (uint64_t)ru.ru_utime.tv_sec * 1000000ull + (uint64_t)ru.ru_utime.tv_usec;
+    u->sys_us = (uint64_t)ru.ru_stime.tv_sec * 1000000ull + (uint64_t)ru.ru_stime.tv_usec;
+    u->peak_kb = (uint64_t)ru.ru_maxrss; /* kilobytes on Linux */
+    return 0;
+}
+
+int plat_exe_path(char *buf, size_t n)
+{
+    ssize_t len;
+
+    if (n < 2) {
+        return -1;
+    }
+    len = readlink("/proc/self/exe", buf, n - 1);
+    if (len < 0 || (size_t)len >= n - 1) {
+        return -1;
+    }
+    buf[len] = '\0';
+    return 0;
+}
+
+void plat_sleep_ms(unsigned ms)
+{
+    struct timespec ts;
+
+    ts.tv_sec = (time_t)(ms / 1000u);
+    ts.tv_nsec = (long)(ms % 1000u) * 1000000L;
+    while (nanosleep(&ts, &ts) != 0 && errno == EINTR) {
+        /* continue with the remaining time */
+    }
 }

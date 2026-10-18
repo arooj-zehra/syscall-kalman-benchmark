@@ -1,0 +1,12 @@
+started:   2026-10-18 12:24:50.974
+platform:  linux
+os:        Linux 6.18.40.1-microsoft-standard-WSL2 x86_64 (WSL detected)
+cpus:      8 logical
+build:     Release
+compiler:  15.2.0
+tmpdir:    results/tmp/
+quick:     no
+cpu_model: Intel(R) Core(TM) i7-7700HQ CPU @ 2.80GHz
+kernel:    6.18.40.1-microsoft-standard-WSL2
+memory:    7884 MB
+governor:  n/a

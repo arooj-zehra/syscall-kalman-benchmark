@@ -38,6 +38,9 @@ Needed around the calls and logged the same way:
 | `plat_shm_detach` | `shmdt` | `UnmapViewOfFile` | leave a shared segment |
 | `plat_shm_destroy` | `shmdt` + `shmctl(IPC_RMID)` | `UnmapViewOfFile` + `CloseHandle` | remove a segment |
 | `plat_getuid`, `plat_getgid` | `getuid`, `getgid` | return the pseudo id 1000 | permission demo |
+| `plat_usage_self` | `getrusage(RUSAGE_SELF)` | `GetProcessTimes` + `GetProcessMemoryInfo` | CPU time and peak memory for the benchmark (Phase 4) |
+| `plat_exe_path` | `readlink("/proc/self/exe")` | `GetModuleFileName` | the benchmark driver starts a copy of itself per case |
+| `plat_sleep_ms` | `nanosleep` | `Sleep` | let child processes finish before timing `plat_wait` |
 
 ## Design notes worth quoting in the report
 
@@ -65,6 +68,10 @@ Where Windows differs from Linux, the wrapper hides the difference. These are th
 | Exit code | 0 to 255, or 128+signal | 32-bit value | passed through as an `int` |
 
 Windows system calls are reached through the Win32 API, which sits on top of the kernel's own system calls; the benchmark therefore measures the Win32 call, not the raw kernel entry.
+
+## Benchmark harness (`bench/`)
+
+Built on these wrappers; see `BENCHMARK_METHOD.md` for the protocol, the case list and the CSV columns.
 
 ## Demo programs (`src/syscalls/`)
 

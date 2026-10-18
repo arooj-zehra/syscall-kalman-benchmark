@@ -1,0 +1,8 @@
+started:   2026-10-18 12:14:44.696
+platform:  windows
+os:        Windows build 19045.7725 x64
+cpus:      8 logical
+build:     Release
+compiler:  14.2.0
+tmpdir:    results\tmp/
+quick:     no

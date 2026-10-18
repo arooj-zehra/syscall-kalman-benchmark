@@ -3,6 +3,7 @@
 #include "platform.h"
 
 #include <windows.h>
+#include <psapi.h>
 
 #include <stdio.h>
 
@@ -117,4 +118,53 @@ int plat_selftest_failing_call(void)
         return 0;
     }
     return -1;
+}
+
+static uint64_t filetime_us(FILETIME ft)
+{
+    ULARGE_INTEGER v;
+
+    v.LowPart = ft.dwLowDateTime;
+    v.HighPart = ft.dwHighDateTime;
+    return v.QuadPart / 10ull; /* FILETIME counts 100 ns units */
+}
+
+int plat_usage_self(plat_usage *u)
+{
+    FILETIME created;
+    FILETIME exited;
+    FILETIME kernel;
+    FILETIME user;
+    PROCESS_MEMORY_COUNTERS pmc;
+
+    if (!GetProcessTimes(GetCurrentProcess(), &created, &exited, &kernel, &user)) {
+        return -1;
+    }
+    pmc.cb = sizeof pmc;
+    if (!GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof pmc)) {
+        return -1;
+    }
+    u->user_us = filetime_us(user);
+    u->sys_us = filetime_us(kernel);
+    u->peak_kb = (uint64_t)(pmc.PeakWorkingSetSize / 1024u);
+    return 0;
+}
+
+int plat_exe_path(char *buf, size_t n)
+{
+    DWORD len;
+
+    if (n < 2) {
+        return -1;
+    }
+    len = GetModuleFileNameA(NULL, buf, (DWORD)n);
+    if (len == 0 || len >= (DWORD)n) {
+        return -1;
+    }
+    return 0;
+}
+
+void plat_sleep_ms(unsigned ms)
+{
+    Sleep((DWORD)ms);
 }

@@ -188,6 +188,31 @@ unsigned plat_umask(unsigned mask);                         /* sets the mask, re
 long     plat_getuid(void);
 long     plat_getgid(void);
 
+/* ---- Resource usage (Phase 4) --------------------------------------------
+ * Used by the benchmark harness to report CPU time and memory next to the
+ * timings. Linux: getrusage(RUSAGE_SELF). Windows: GetProcessTimes() and
+ * GetProcessMemoryInfo().
+ *
+ * user_us and sys_us are CPU time used by this process since it started
+ * (all threads); subtract two readings to get a delta. Resolution is coarse:
+ * Windows accounts CPU time in scheduler ticks (about 15.6 ms), so only deltas
+ * over runs of a second or more are meaningful. peak_kb is the process's
+ * high-water mark of resident memory (Linux ru_maxrss, Windows
+ * PeakWorkingSetSize); it never decreases. */
+typedef struct {
+    uint64_t user_us;
+    uint64_t sys_us;
+    uint64_t peak_kb;
+} plat_usage;
+
+int plat_usage_self(plat_usage *u);
+
+/* Full path of the running executable (used to start a copy of it). */
+int plat_exe_path(char *buf, size_t n);
+
+/* Sleep without using the CPU. nanosleep() / Sleep(). */
+void plat_sleep_ms(unsigned ms);
+
 #ifdef __cplusplus
 }
 #endif

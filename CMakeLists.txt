@@ -48,8 +48,10 @@ else()
   target_compile_definitions(oscore PUBLIC _GNU_SOURCE)
 endif()
 
-# Wrapped system calls (platform.h, Phase 2+). The Windows file arrives in Phase 3.
-if(UNIX)
+# Wrapped system calls (platform.h): Linux in Phase 2, Windows in Phase 3.
+if(WIN32)
+  target_sources(oscore PRIVATE src/win/sys_win.c)
+else()
   target_sources(oscore PRIVATE src/linux/sys_linux.c)
 endif()
 
@@ -64,13 +66,8 @@ endif()
 add_executable(hello src/hello.c)
 target_link_libraries(hello PRIVATE oscore)
 
-# System call demos. Linux now; the Windows build joins in Phase 3 once
-# src/win/sys_win.c exists (then replace this if/else with a plain add_subdirectory).
-if(UNIX)
-  add_subdirectory(src/syscalls)
-else()
-  message(STATUS "System call demos skipped on Windows until Phase 3 (src/win/sys_win.c)")
-endif()
+# System call demos (Phases 2-3): built on both operating systems.
+add_subdirectory(src/syscalls)
 
 # Added in later phases (uncomment when the folder has sources):
 # add_subdirectory(bench)          # Phase 4: benchmark harness

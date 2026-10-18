@@ -23,7 +23,9 @@ typedef enum {
 } LogLevel;
 
 /* Open (append) a log file. Returns 0 on success. On failure (or path == NULL)
- * logging continues to stderr only and -1 is returned for a failed open. */
+ * logging continues to stderr only and -1 is returned for a failed open.
+ * The minimum level starts at INFO; the environment variable SK_LOG_LEVEL
+ * (debug, info, warn or error) overrides it when log_init() is called. */
 int  log_init(const char *path);
 void log_close(void);
 void log_set_level(LogLevel min_level);

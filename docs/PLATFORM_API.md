@@ -11,7 +11,7 @@ Everything the portable code needs from the OS is declared in `include/platform.
 
 ## The 15 calls
 
-| Group | Wrapper | Linux | Windows (Phase 3) |
+| Group | Wrapper | Linux | Windows |
 | --- | --- | --- | --- |
 | File I/O | `plat_open` | `open` | `CreateFile` |
 | | `plat_read` | `read` | `ReadFile` |
@@ -37,7 +37,7 @@ Needed around the calls and logged the same way:
 | `plat_stat_path` | `stat` | `GetFileAttributesEx` + security query | read size, mode, owner |
 | `plat_shm_detach` | `shmdt` | `UnmapViewOfFile` | leave a shared segment |
 | `plat_shm_destroy` | `shmdt` + `shmctl(IPC_RMID)` | `UnmapViewOfFile` + `CloseHandle` | remove a segment |
-| `plat_getuid`, `plat_getgid` | `getuid`, `getgid` | return -1 | permission demo |
+| `plat_getuid`, `plat_getgid` | `getuid`, `getgid` | return the pseudo id 1000 | permission demo |
 
 ## Design notes worth quoting in the report
 
@@ -46,18 +46,40 @@ Needed around the calls and logged the same way:
 - **Stale shared memory.** System V segments outlive a crashed process. `plat_shm_create` removes a leftover segment with the same name, logs a warning, and retries once.
 - **Anonymous and file mappings have separate release calls** because Windows uses `VirtualFree` for one and `UnmapViewOfFile` for the other.
 
+## Windows translation notes (`src/win/sys_win.c`)
+
+Where Windows differs from Linux, the wrapper hides the difference. These are the behaviours to explain and compare in the report.
+
+| Topic | Linux | Windows | What the wrapper does |
+| --- | --- | --- | --- |
+| Starting a program | `fork()` then `exec()` | one call, `CreateProcess` | `plat_spawn` builds a quoted command line and passes an explicit list of inherited handles (`PROC_THREAD_ATTRIBUTE_HANDLE_LIST`), plus the parent's stdin, stdout and stderr, so output goes where the parent's goes |
+| Handle inheritance | close-on-exec flag cleared for listed descriptors | `HANDLE_FLAG_INHERIT` set for listed handles, restored afterwards | same rule on both: only listed handles reach the child |
+| End of a pipe | `read` returns 0 | `ReadFile` fails with `ERROR_BROKEN_PIPE` | `plat_read` turns the broken-pipe error into a return of 0 |
+| Opening an invalid handle for mapping | `mmap` fails with `EBADF` | `CreateFileMapping(INVALID_HANDLE_VALUE)` succeeds, backed by the paging file | `plat_map_file` rejects the invalid handle itself |
+| Deleting an open file | allowed | needs `FILE_SHARE_DELETE` | `plat_open` shares read, write and delete; `plat_unlink` retries for up to 200 ms if a virus scanner holds the file |
+| Shared memory lifetime | segment survives a crash until removed | object disappears with its last handle | no stale-segment cleanup needed; creating a name that is in use fails |
+| Mode bits | `chmod` sets rwx for owner, group, other | access control list (ACL) | `plat_chmod` writes a three-entry DACL (owner, the local `BUILTIN\Users` group as the "group" class, Everyone); `plat_stat_path` reads the bits back from those entries. The file's own primary group is deliberately not used, because on many accounts it is the same SID as the owner and the two classes could not be told apart. The owner entry always keeps delete, change-permissions and take-ownership rights |
+| `umask` | per-process mask applied at creation | none | emulated in `plat_open`: once `plat_umask` has been called, new files get `mode & ~umask` |
+| Users | numeric uid and gid | SIDs | pseudo ids: 1000 is the current user, 0 is the Administrators group, others are rejected |
+| `chown` | needs root to give a file away | needs the take-ownership privilege | assigning Administrators fails in a normal shell (error 1307) and succeeds in an elevated one |
+| Exit code | 0 to 255, or 128+signal | 32-bit value | passed through as an `int` |
+
+Windows system calls are reached through the Win32 API, which sits on top of the kernel's own system calls; the benchmark therefore measures the Win32 call, not the raw kernel entry.
+
 ## Demo programs (`src/syscalls/`)
 
 Each exits 0 only if all of its checks pass, and writes a log named `demo_<name>.log`.
 
 | Demo | Covers | Linux | Windows |
 | --- | --- | --- | --- |
-| `demo_fileio` | open, read, write, close | passes | Phase 3 |
-| `demo_process` | spawn, wait | passes | Phase 3 |
+| `demo_fileio` | open, read, write, close | passes | ported |
+| `demo_process` | spawn, wait | passes | ported |
 | `demo_process_linux` | fork, exec, wait separately (copy-on-write, `ECHILD`) | passes | not applicable |
-| `demo_memory` | anonymous and file mapping | passes | Phase 3 |
-| `demo_ipc` | pipe, shared memory | passes | Phase 3 |
-| `demo_perms` | umask, chmod, chown | passes | Phase 3 |
+| `demo_memory` | anonymous and file mapping | passes | ported |
+| `demo_ipc` | pipe, shared memory | passes | ported |
+| `demo_perms` | umask, chmod, chown | passes | ported; the ACL translation needs checking on real Windows |
+
+On a failed check, `demo_perms` leaves `sk_perms.tmp` behind. On Windows run `icacls sk_perms.tmp` to see its access list.
 
 `child_helper` is the program the process and IPC demos start. Run everything with `ctest --test-dir build --output-on-failure`.
 

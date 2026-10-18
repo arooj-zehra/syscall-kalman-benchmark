@@ -4,6 +4,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static FILE *g_file = NULL;
@@ -32,6 +33,20 @@ static const char *base_name(const char *path)
 
 int log_init(const char *path)
 {
+    const char *env = getenv("SK_LOG_LEVEL");
+
+    if (env != NULL) {
+        if (strcmp(env, "debug") == 0) {
+            g_min_level = LOG_LEVEL_DEBUG;
+        } else if (strcmp(env, "info") == 0) {
+            g_min_level = LOG_LEVEL_INFO;
+        } else if (strcmp(env, "warn") == 0) {
+            g_min_level = LOG_LEVEL_WARN;
+        } else if (strcmp(env, "error") == 0) {
+            g_min_level = LOG_LEVEL_ERROR;
+        }
+    }
+
     if (g_file != NULL) {
         fclose(g_file);
         g_file = NULL;

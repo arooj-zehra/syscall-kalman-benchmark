@@ -104,8 +104,8 @@ int plat_unlink(const char *path);
 typedef struct {
     int64_t size;     /* bytes */
     unsigned mode;    /* permission bits, e.g. 0644 */
-    long uid;         /* owner (Linux); -1 on Windows */
-    long gid;         /* group (Linux); -1 on Windows */
+    long uid;         /* owner. Windows: 0 = Administrators, 1000 = current user, -1 = anyone else */
+    long gid;         /* group. Windows: always -1 */
 } plat_stat;
 
 int plat_stat_path(const char *path, plat_stat *st);
@@ -127,7 +127,9 @@ int plat_spawn(const char *exe, char *const argv[],
                const plat_handle *inherit, int n_inherit, plat_proc *out);
 
 /* Wait for the child to end and fetch its exit code. If the child was killed
- * by a signal (Linux) the code is 128 + signal number. */
+ * by a signal (Linux) the code is 128 + signal number. Each child must be
+ * waited for exactly once: this also releases it (reaps the zombie on Linux,
+ * closes the process handle on Windows). */
 int plat_wait(plat_proc p, int *exit_code);
 
 /* ---- Memory --------------------------------------------------------------
@@ -168,7 +170,18 @@ int plat_shm_destroy(plat_shm *shm);                               /* creator: d
 
 /* ---- Permissions ---------------------------------------------------------
  * chmod() / SetFileSecurity (DACL), chown() / SetFileSecurity (owner),
- * umask() / no Win32 equivalent (CRT _umask as a labelled fallback). */
+ * umask() / no Win32 equivalent.
+ *
+ * Windows has ACLs, not mode bits, so the Windows wrappers translate:
+ *   - plat_chmod writes a DACL with an owner entry, a BUILTIN\Users entry (the
+ *     "group" class) and an Everyone entry; plat_stat_path reads the mode back
+ *     from those entries.
+ *     (The owner entry always keeps the right to change permissions and delete.)
+ *   - plat_umask is emulated: plat_open applies (mode & ~umask) to files it
+ *     creates once plat_umask has been called.
+ *   - Users are pseudo ids: plat_getuid() is 1000, uid 0 means the
+ *     Administrators group, and other numbers are rejected. Only a privileged
+ *     process may give a file to uid 0. */
 int      plat_chmod(const char *path, unsigned mode);
 int      plat_chown(const char *path, long uid, long gid);  /* -1 leaves a field unchanged */
 unsigned plat_umask(unsigned mask);                         /* sets the mask, returns the old one */

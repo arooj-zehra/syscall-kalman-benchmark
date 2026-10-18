@@ -1,0 +1,4 @@
+os,program,workers,io,tracks,steps,load_ms,compute_ms,write_ms,total_ms,est_hash
+linux,serial,1,mmap,128,20000,0.034,270.617,86.705,357.435,0xebc944b411eaa97b
+linux,serial,1,mmap,16,2000,0.046,3.498,1.355,4.989,0x1173f7f47a860283
+linux,serial,1,mmap,256,100000,0.032,2666.107,1400.164,4068.813,0x07a6e04a7243bf76

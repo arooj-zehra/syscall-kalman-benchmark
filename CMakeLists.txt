@@ -71,7 +71,7 @@ add_subdirectory(src/syscalls)
 
 # Added in later phases (uncomment when the folder has sources):
 add_subdirectory(bench)             # Phase 4: benchmark harness
-# add_subdirectory(src/kalman)     # Phases 5-6: serial filter, master, workers
+add_subdirectory(src/kalman)          # Phases 5-6: serial filter, master, workers
 
 # ---------------------------------------------------------------------------
 # Tests: `ctest --test-dir build --output-on-failure`

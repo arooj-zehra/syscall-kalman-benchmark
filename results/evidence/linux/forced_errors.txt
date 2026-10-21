@@ -1,0 +1,9 @@
+fileio: 2026-10-22 00:34:53.738 [ERROR] [pid 2080] sys_linux.c:47  open(sk_no_such_dir/missing.bin, flags=0x1) failed: errno 2: No such file or directory
+fileio: 2026-10-22 00:34:53.738 [ERROR] [pid 2080] sys_linux.c:47  read(fd=-1, len=4096) failed: errno 9: Bad file descriptor
+fileio: 2026-10-22 00:34:53.738 [ERROR] [pid 2080] sys_linux.c:47  close(fd=4) failed: errno 9: Bad file descriptor
+process: 2026-10-22 00:34:53.743 [ERROR] [pid 2081] sys_linux.c:47  exec(./no_such_program_xyz) failed: errno 2: No such file or directory
+memory: 2026-10-22 00:34:53.748 [ERROR] [pid 2086] sys_linux.c:47  mmap(fd=-1, len=4096, read-only) failed: errno 9: Bad file descriptor
+ipc: 2026-10-22 00:34:53.752 [ERROR] [pid 2087] sys_linux.c:47  shmget(name=sk_demo_shm, key=0x7d882c1e) [attach existing] failed: errno 2: No such file or directory
+perms: 2026-10-22 00:34:53.754 [ERROR] [pid 2090] sys_linux.c:47  chown(sk_perms.tmp, uid=0, gid=-1) failed: errno 1: Operation not permitted
+perms: 2026-10-22 00:34:53.754 [ERROR] [pid 2090] sys_linux.c:47  chmod(sk_no_such_file.tmp, 0600) failed: errno 2: No such file or directory
+process_linux: 2026-10-22 00:34:53.759 [ERROR] [pid 2091] demo_process_linux.c:97  waitpid(-1) with no children failed: errno 10: No child processes

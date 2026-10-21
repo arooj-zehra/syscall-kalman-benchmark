@@ -1,0 +1,6 @@
+Linux calls missing from src/linux: none
+Windows calls missing from src/win: none
+wrappers without a logging call in their body: none
+raw file/mmap/stdio calls in the filter's data path: none
+malloc/calloc in src/kalman (bookkeeping, buffers for generating/reading): kf_master.c: 3, kf_serial.c: 1, kfgen.c: 1, kfio.c: 1
+portable files with OS-specific includes or #ifdefs: none

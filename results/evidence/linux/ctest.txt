@@ -1,0 +1,13 @@
+Test project /home/aroojzahra/os-ccp/build
+    Start 11: kf_unit
+1/4 Test #11: kf_unit ..........................   Passed    0.05 sec
+    Start 12: kf_consistency
+2/4 Test #12: kf_consistency ...................   Passed    0.01 sec
+    Start 13: kf_pipeline
+3/4 Test #13: kf_pipeline ......................   Passed    0.41 sec
+    Start 14: kf_parallel
+4/4 Test #14: kf_parallel ......................   Passed    0.22 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   0.70 sec

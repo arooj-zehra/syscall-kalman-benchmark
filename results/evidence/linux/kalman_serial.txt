@@ -1,0 +1,8 @@
+$ build/bin/kf_serial --in results/evidence/linux/ev_meas.bin --out results/evidence/linux/ev_est.bin
+kf_serial: 16 tracks x 2000 steps, io=mmap, 1 pass
+  load    :      0.03 ms
+  compute :      3.78 ms  (8.47 million steps/s)
+  hash    :      0.21 ms
+  write   :      0.55 ms
+  total   :      4.59 ms
+est_hash=0x1173f7f47a860283

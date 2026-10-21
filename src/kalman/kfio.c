@@ -103,6 +103,21 @@ int kf_writer_append(kf_writer *w, const double *data, size_t n_doubles)
     return 0;
 }
 
+int kf_writer_append_nohash(kf_writer *w, const double *data, size_t n_doubles)
+{
+    if (write_all(w->h, data, n_doubles * sizeof(double)) != 0) {
+        LOG_ERROR("write to %s failed", w->path);
+        return -1;
+    }
+    w->bytes += (uint64_t)n_doubles * sizeof(double);
+    return 0;
+}
+
+void kf_writer_set_hash(kf_writer *w, uint64_t hash)
+{
+    w->hash = hash;
+}
+
 int kf_writer_close(kf_writer *w)
 {
     plat_handle h;

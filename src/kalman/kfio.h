@@ -80,6 +80,10 @@ typedef struct {
 
 int kf_writer_open(kf_writer *w, const char *path, const kf_file_header *hdr);
 int kf_writer_append(kf_writer *w, const double *data, size_t n_doubles);
+/* Same, but does not hash: for callers that hashed the data themselves (the
+ * parallel master hashes the shared output once). Give the hash before close. */
+int kf_writer_append_nohash(kf_writer *w, const double *data, size_t n_doubles);
+void kf_writer_set_hash(kf_writer *w, uint64_t hash);
 int kf_writer_close(kf_writer *w);
 
 /* ---- reading ---------------------------------------------------------------

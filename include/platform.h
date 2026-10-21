@@ -149,6 +149,9 @@ int   plat_unmap_file(void *addr, size_t len);
  * Pipe: pipe() / CreatePipe(); use plat_read, plat_write and plat_close on
  * the two ends. Both ends are private to this process until passed to
  * plat_spawn().
+ * Writing to a pipe whose read end is closed returns -1 (Linux: SIGPIPE is
+ * ignored once the first pipe is made), so a vanished peer is an error the
+ * caller can handle, as on Windows.
  *
  * Shared memory: shmget() + shmat() / CreateFileMapping (named) +
  * MapViewOfFile. A segment is identified by `name`; the creating process

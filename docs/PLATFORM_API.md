@@ -58,6 +58,7 @@ Where Windows differs from Linux, the wrapper hides the difference. These are th
 | Starting a program | `fork()` then `exec()` | one call, `CreateProcess` | `plat_spawn` builds a quoted command line and passes an explicit list of inherited handles (`PROC_THREAD_ATTRIBUTE_HANDLE_LIST`), plus the parent's stdin, stdout and stderr, so output goes where the parent's goes |
 | Handle inheritance | close-on-exec flag cleared for listed descriptors | `HANDLE_FLAG_INHERIT` set for listed handles, restored afterwards | same rule on both: only listed handles reach the child |
 | End of a pipe | `read` returns 0 | `ReadFile` fails with `ERROR_BROKEN_PIPE` | `plat_read` turns the broken-pipe error into a return of 0 |
+| Write to a pipe nobody reads | `SIGPIPE` kills the process (or `EPIPE` if ignored) | `WriteFile` fails | Linux: `plat_pipe` ignores `SIGPIPE` once, so `plat_write` returns -1 on both systems; the parallel master relies on this to notice a dead worker |
 | Opening an invalid handle for mapping | `mmap` fails with `EBADF` | `CreateFileMapping(INVALID_HANDLE_VALUE)` succeeds, backed by the paging file | `plat_map_file` rejects the invalid handle itself |
 | Deleting an open file | allowed | needs `FILE_SHARE_DELETE` | `plat_open` shares read, write and delete; `plat_unlink` retries for up to 200 ms if a virus scanner holds the file |
 | Shared memory lifetime | segment survives a crash until removed | object disappears with its last handle | no stale-segment cleanup needed; creating a name that is in use fails |

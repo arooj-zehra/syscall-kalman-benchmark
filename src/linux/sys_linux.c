@@ -17,6 +17,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -275,8 +276,16 @@ int plat_unmap_file(void *addr, size_t len)
 
 int plat_pipe(plat_handle *rd, plat_handle *wr)
 {
+    static int sigpipe_ignored = 0;
     int fds[2];
 
+    /* Match Windows: writing to a pipe whose reader has gone fails with an error
+     * (EPIPE) that the caller can handle, instead of killing the process with
+     * SIGPIPE. Done once, the first time a pipe is made. */
+    if (!sigpipe_ignored) {
+        (void)signal(SIGPIPE, SIG_IGN);
+        sigpipe_ignored = 1;
+    }
     if (pipe2(fds, O_CLOEXEC) != 0) {
         syserr("pipe()");
         return -1;

@@ -4,8 +4,9 @@
 #   small   16 tracks x    2,000 steps  (0.5 MiB)
 #   medium 128 tracks x   20,000 steps  (39 MiB)
 #   large  256 tracks x  100,000 steps  (391 MiB input, 781 MiB output)
-# Writes data/meas_<preset>.bin, data/est_serial_<preset>.bin and appends a timing
-# row to results/serial_linux.csv. The data files are not committed (see .gitignore).
+# Writes data/meas_<preset>.bin and data/est_serial_<preset>.bin (the serial result the
+# parallel runs are checked against). Timing comes from scripts/run_scaling.sh.
+# The data files are not committed (see .gitignore).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -21,8 +22,7 @@ echo "== generate ($PRESET)"
 "$BIN/kfgen" --preset "$PRESET" --out "data/meas_$PRESET.bin"
 
 echo "== serial filter"
-"$BIN/kf_serial" --in "data/meas_$PRESET.bin" --out "data/est_serial_$PRESET.bin" \
-    --io mmap --csv results/serial_linux.csv
+"$BIN/kf_serial" --in "data/meas_$PRESET.bin" --out "data/est_serial_$PRESET.bin" --io mmap
 
 echo "== evaluate"
 "$BIN/kf_eval" --meas "data/meas_$PRESET.bin" --est "data/est_serial_$PRESET.bin" --check

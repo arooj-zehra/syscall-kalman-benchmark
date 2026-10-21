@@ -7,16 +7,19 @@
 #   test_kalman  unit tests            kf_check   statistical consistency test
 #   kf_pipeline  end-to-end test (generate, filter twice, evaluate, Python reference)
 
-add_library(kfcore STATIC kalman.c datagen.c kfio.c)
+add_library(kfcore STATIC kalman.c datagen.c kfio.c kfproto.c)
 target_link_libraries(kfcore PUBLIC oscore)
 target_include_directories(kfcore PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+# kf_master starts kf_worker from the folder it runs in; it needs the platform's
+# executable suffix.
+target_compile_definitions(kfcore PRIVATE KF_EXE_SUFFIX="${CMAKE_EXECUTABLE_SUFFIX}")
 if(NOT MSVC)
   # Never fuse a*b+c: serial and parallel runs, and both operating systems, must
   # give identical bits.
   target_compile_options(kfcore PRIVATE -ffp-contract=off)
 endif()
 
-foreach(tool kfgen kf_serial kf_eval kf_check test_kalman)
+foreach(tool kfgen kf_serial kf_eval kf_check test_kalman kf_worker kf_master)
   add_executable(${tool} ${tool}.c)
   target_link_libraries(${tool} PRIVATE kfcore)
   if(UNIX)
@@ -51,3 +54,12 @@ add_test(NAME kf_pipeline
     -DWORKDIR=${CMAKE_CURRENT_BINARY_DIR}/pipeline
     -P ${CMAKE_CURRENT_SOURCE_DIR}/pipeline_test.cmake)
 set_tests_properties(kf_pipeline PROPERTIES TIMEOUT 300)
+
+# Phase 6: parallel filter (kf_master + kf_worker) against the serial reference.
+add_dependencies(kf_master kf_worker)
+add_test(NAME kf_parallel
+  COMMAND ${CMAKE_COMMAND}
+    -DKFGEN=$<TARGET_FILE:kfgen> -DKF_SERIAL=$<TARGET_FILE:kf_serial> -DKF_MASTER=$<TARGET_FILE:kf_master>
+    -DWORKDIR=${CMAKE_CURRENT_BINARY_DIR}/parallel
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/parallel_test.cmake)
+set_tests_properties(kf_parallel PROPERTIES TIMEOUT 300)

@@ -1,0 +1,8 @@
+fileio: 2026-10-22 21:20:34.850 [ERROR] [pid 5140] sys_win.c:50  CreateFile(sk_no_such_dir/missing.bin, flags=0x1) failed: error 3: The system cannot find the path specified.
+fileio: 2026-10-22 21:20:34.850 [ERROR] [pid 5140] sys_win.c:50  ReadFile(handle=-1, len=4096) failed: error 6: The handle is invalid.
+fileio: 2026-10-22 21:20:34.850 [ERROR] [pid 5140] sys_win.c:50  CloseHandle(handle=212) failed: error 6: The handle is invalid.
+process: 2026-10-22 21:20:34.898 [ERROR] [pid 13388] sys_win.c:50  CreateProcess(./no_such_program_xyz) failed: error 2: The system cannot find the file specified.
+memory: 2026-10-22 21:20:34.929 [ERROR] [pid 6036] sys_win.c:50  CreateFileMapping(handle=-1, len=4096) failed: error 6: The handle is invalid.
+ipc: 2026-10-22 21:20:34.975 [ERROR] [pid 4160] sys_win.c:50  OpenFileMapping(name=Local\sk_demo_shm) [attach existing] failed: error 2: The system cannot find the file specified.
+perms: 2026-10-22 21:20:34.998 [ERROR] [pid 9632] sys_win.c:50  SetFileSecurity(sk_perms.tmp, owner=uid 0) failed: error 1307: This security ID may not be assigned as the owner of this object.
+perms: 2026-10-22 21:20:34.998 [ERROR] [pid 9632] sys_win.c:50  GetFileSecurity(sk_no_such_file.tmp) failed: error 2: The system cannot find the file specified.

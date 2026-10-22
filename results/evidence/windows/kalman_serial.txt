@@ -1,0 +1,8 @@
+$ build\bin\kf_serial.exe --in results\evidence\windows\ev_meas.bin --out results\evidence\windows\ev_est.bin
+kf_serial: 16 tracks x 2000 steps, io=mmap, 1 pass
+  load    :      0.29 ms
+  compute :      4.11 ms  (7.78 million steps/s)
+  hash    :      0.21 ms
+  write   :     10.03 ms
+  total   :     14.67 ms
+est_hash=0x1173f7f47a860283

@@ -1,0 +1,3 @@
+$ build\bin\kfgen.exe --preset small --out results\evidence\windows\ev_meas.bin
+kfgen: wrote C:\Users\Kazim\os-ccp\results\evidence\windows\ev_meas.bin: 16 tracks x 2000 steps, seed 1, 0.5 MiB in 0.01 s
+data_hash=0x317e5238757050e2
